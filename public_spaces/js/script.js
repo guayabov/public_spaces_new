@@ -1,100 +1,123 @@
-document.getElementById('registerForm')?.addEventListener('submit', function(event) {
-    event.preventDefault();
+// Clase Validator para validar entradas de usuario
+class Validator {
+    constructor(strategy) {
+        this.strategy = strategy;
+    }
 
+    validate(value) {
+        return this.strategy(value);
+    }
+}
+
+// Estrategias de validación
+const strategies = {
+    isNotEmpty: value => value.trim() !== '',
+    isEmail: value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
+    isPasswordValid: value => value.length >= 6
+};
+
+// Validar campos
+function validateUserFields(username, email, password) {
+    const validators = [
+        new Validator(strategies.isNotEmpty).validate(username) ? null : 'El nombre de usuario no puede estar vacío.',
+        new Validator(strategies.isEmail).validate(email) ? null : 'El correo electrónico no es válido.',
+        new Validator(strategies.isPasswordValid).validate(password) ? null : 'La contraseña debe tener al menos 6 caracteres.'
+    ];
+
+    const errors = validators.filter(error => error !== null);
+    if (errors.length > 0) {
+        alert(errors.join('\n'));
+        return false;
+    }
+    return true;
+}
+
+// Registro de usuarios
+document.getElementById('registerForm')?.addEventListener('submit', function (event) {
+    event.preventDefault(); // Prevenir recarga de la página
+
+    // Obtener los valores del formulario
     const username = document.getElementById('username').value;
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
-    const users = JSON.parse(localStorage.getItem('users')) || [];
-    const userExists = users.some(user => user.username === username);
-
-    if (userExists) {
-        alert('El usuario ya existe. Por favor, elige otro nombre de usuario.');
+    // Validar que todos los campos estén llenos
+    if (!username || !email || !password) {
+        alert('Por favor, llena todos los campos.');
         return;
     }
 
-    users.push({ username, email, password });
-    localStorage.setItem('users', JSON.stringify(users));
-
-    alert('Usuario registrado con éxito.');
-    window.location.href = 'index.html'; 
+    // Enviar datos al servidor
+    fetch('http://localhost:3000/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password, role: 'user' }) // Enviar datos como JSON
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message); // Mostrar mensaje de éxito
+                window.location.href = 'index.html'; // Redirigir al inicio de sesión
+            } else if (data.error) {
+                alert('Error: ' + data.error); // Mostrar error devuelto por el servidor
+            }
+        })
+        .catch(error => console.error('Error registrando usuario:', error)); // Manejar errores
 });
 
-document.getElementById('loginForm')?.addEventListener('submit', function(event) {
-    event.preventDefault();
+
+// Inicio de sesión
+document.getElementById('loginForm')?.addEventListener('submit', function (event) {
+    event.preventDefault(); // Prevenir recarga de la página
 
     const username = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;
 
-    const users = JSON.parse(localStorage.getItem('users')) || [];
-    const user = users.find(user => user.username === username && user.password === password);
-
-    if (user) {
-        alert('Inicio de sesión exitoso.');
-        window.location.href = 'dashboard.html'; 
-    } else {
-        alert('Usuario o contraseña incorrectos.');
-    }
+    fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }) // Enviar los datos de login
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message); // Mostrar mensaje de éxito
+                localStorage.setItem('loggedInUser', data.user.username); // Guardar usuario en sesión
+                window.location.href = 'dashboard.html'; // Redirigir al dashboard
+            } else if (data.error) {
+                alert('Error: ' + data.error); // Mostrar error devuelto por el servidor
+            }
+        })
+        .catch(error => console.error('Error iniciando sesión:', error)); // Manejar errores
 });
-const spaces = [
-    { id: 1, name: "Sala de Conferencias", description: "Una sala grande para conferencias.", capacity: 50, available: true },
-    { id: 2, name: "Auditorio", description: "Auditorio con escenario y capacidad para 100 personas.", capacity: 100, available: true },
-    { id: 3, name: "Sala de Reuniones", description: "Pequeña sala para reuniones privadas.", capacity: 10, available: true }
-];
 
-document.addEventListener('DOMContentLoaded', function() {
+// Cargar espacios desde la base de datos
+document.addEventListener('DOMContentLoaded', function () {
     const spacesList = document.getElementById('spacesList');
-    const savedSpaces = JSON.parse(localStorage.getItem('spaces')) || spaces;
-    
-    savedSpaces.forEach(space => {
-        const spaceDiv = document.createElement('div');
-        spaceDiv.className = 'space';
 
-        spaceDiv.innerHTML = `
-            <h3>${space.name}</h3>
-            <p>${space.description}</p>
-            <p>Capacidad: ${space.capacity}</p>
-            <p>Estado: ${space.available ? 'Disponible' : 'Reservado'}</p>
-            <button ${!space.available ? 'disabled' : ''} onclick="reserveSpace(${space.id})">
-                ${space.available ? 'Reservar' : 'No Disponible'}
-            </button>
-        `;
+    fetch('http://localhost:3000/api/spaces')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(space => {
+                const spaceDiv = document.createElement('div');
+                spaceDiv.className = 'space';
 
-        spacesList.appendChild(spaceDiv);
-    });
+                spaceDiv.innerHTML = `
+                    <h3>${space.name}</h3>
+                    <p>${space.description}</p>
+                    <p>Capacidad: ${space.capacity}</p>
+                    <label for="date-${space.id}">Fecha:</label>
+                    <input type="date" id="date-${space.id}" />
+                    <button onclick="reserveSpace(${space.id})">Reservar</button>
+                `;
+
+                spacesList.appendChild(spaceDiv);
+            });
+        })
+        .catch(error => console.error('Error obteniendo espacios:', error));
 });
 
-const users = [
-    { username: 'admin', role: 'admin' },
-    { username: 'user1', role: 'user' }
-];
-
-
-let reservations = JSON.parse(localStorage.getItem('reservations')) || [];
-
-document.addEventListener('DOMContentLoaded', function() {
-    const spacesList = document.getElementById('spacesList');
-    const currentUser = localStorage.getItem('loggedInUser');
-    const userRole = users.find(user => user.username === currentUser)?.role;
-
-    spaces.forEach(space => {
-        const spaceDiv = document.createElement('div');
-        spaceDiv.className = 'space';
-
-        spaceDiv.innerHTML = `
-            <h3>${space.name}</h3>
-            <p>${space.description}</p>
-            <p>Capacidad: ${space.capacity}</p>
-            <label for="date-${space.id}">Fecha:</label>
-            <input type="date" id="date-${space.id}" />
-            <button onclick="reserveSpace(${space.id})">Reservar</button>
-            ${userRole === 'admin' ? '<button onclick="modifySpace()">Modificar Espacio</button>' : ''}
-        `;
-
-        spacesList.appendChild(spaceDiv);
-    });
-});
-
+// Reservar espacio
 function reserveSpace(spaceId) {
     const currentUser = localStorage.getItem('loggedInUser');
     const dateInput = document.getElementById(`date-${spaceId}`).value;
@@ -104,29 +127,25 @@ function reserveSpace(spaceId) {
         return;
     }
 
-    const userReservations = reservations.filter(res => res.username === currentUser);
-    if (userReservations.length >= 2) {
-        alert('No puedes tener más de dos reservas activas.');
-        return;
-    }
-
-    const existingReservation = reservations.find(res => res.spaceId === spaceId && res.date === dateInput);
-    if (existingReservation) {
-        alert('Este espacio ya ha sido reservado en esa fecha.');
-        return;
-    }
-
-    reservations.push({ username: currentUser, spaceId, date: dateInput });
-    localStorage.setItem('reservations', JSON.stringify(reservations));
-
-    alert('Reserva realizada con éxito.');
-    window.location.reload(); 
+    fetch('http://localhost:3000/api/reservations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: currentUser, spaceId, date: dateInput })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert('Reserva realizada con éxito.');
+                window.location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => console.error('Error realizando reserva:', error));
 }
 
-document.getElementById('logoutButton').addEventListener('click', function() {
+// Cerrar sesión
+document.getElementById('logoutButton')?.addEventListener('click', function () {
     localStorage.removeItem('loggedInUser');
-    window.location.href = 'index.html'; 
+    window.location.href = 'index.html';
 });
-
-localStorage.setItem('loggedInUser', 'user1'); 
-
