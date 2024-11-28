@@ -1,0 +1,184 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background-color: white;
+    padding: 20px 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+input {
+    margin-bottom: 15px;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+p {
+    text-align: center;
+    font-size: 14px;
+}
+
+a {
+    color: #007BFF;
+    text-decoration: none;
+}
+/* Estilo para el formulario de login */
+
+
+form#loginForm {
+    background: #ffffff;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+form#loginForm h2 {
+    font-size: 24px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+form#loginForm input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+form#loginForm input:focus {
+    border-color: #007BFF;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+form#loginForm button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+}
+
+form#loginForm button:hover {
+    background-color: #0056b3;
+}
+
+form#loginForm p {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+form#loginForm p a {
+    color: #007BFF;
+    text-decoration: none;
+}
+
+form#loginForm p a:hover {
+    text-decoration: underline;
+}
+/* Fondo del cuerpo */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #007BFF, #6C757D); /* Degradado azul a gris */
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+}
+
+/* Encabezado principal */
+h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Sombra ligera */
+}
+
+/* Texto descriptivo */
+p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    color: #272525;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Contenedor de los botones */
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Botones principales */
+.actions a {
+    display: inline-block;
+    text-decoration: none;
+    background-color: #ffffff;
+    color: #007BFF;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra en los botones */
+    transition: all 0.3s ease-in-out; /* Animación suave */
+}
+
+/* Efecto hover en los botones */
+.actions a:hover {
+    background-color: #007BFF;
+    color: white;
+    transform: translateY(-2px); /* Elevar botón */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Sombra más marcada */
+}
+
+
+
