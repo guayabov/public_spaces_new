@@ -174,11 +174,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 //ver reservas
 function loadUserReservations() {
-    const currentUser = JSON.parse(localStorage.getItem('loggedInUser')); // Obtener usuario logueado
+    const currentUser = JSON.parse(localStorage.getItem('loggedInUser')); // Recuperar usuario del localStorage
 
     if (!currentUser || !currentUser.id) {
         alert('Usuario no autenticado. Por favor, inicia sesión.');
-        window.location.href = 'index.html'; // Redirigir al login
+        window.location.href = 'index.html';
         return;
     }
 
@@ -186,7 +186,7 @@ function loadUserReservations() {
         .then(response => response.json())
         .then(reservations => {
             const reservationsList = document.getElementById('userReservations');
-            reservationsList.innerHTML = '<h4>Mis Reservas</h4>'; // Título de la sección
+            reservationsList.innerHTML = '<h4>Mis Reservas</h4>';
 
             if (reservations.length === 0) {
                 reservationsList.innerHTML += '<p>No tienes reservas activas.</p>';
@@ -199,8 +199,6 @@ function loadUserReservations() {
 
                 reservationItem.innerHTML = `
                     <p><strong>Espacio:</strong> ${reservation.space_name}</p>
-                    <p><strong>Descripción:</strong> ${reservation.description}</p>
-                    <p><strong>Capacidad:</strong> ${reservation.capacity}</p>
                     <p><strong>Fecha:</strong> ${reservation.reservation_date}</p>
                     <button onclick="updateReservation(${reservation.reservation_id})">Actualizar</button>
                     <button onclick="deleteReservation(${reservation.reservation_id})">Eliminar</button>
@@ -209,8 +207,13 @@ function loadUserReservations() {
                 reservationsList.appendChild(reservationItem);
             });
         })
-        .catch(error => console.error('Error cargando reservas del usuario:', error));
+        .catch(error => {
+            console.error('Error cargando reservas del usuario:', error);
+        });
 }
+
+
+
 
 //actualizar reservas
 function updateReservation(reservationId) {
