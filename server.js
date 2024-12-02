@@ -57,7 +57,7 @@ app.post('/api/login', (req, res) => {
         return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
     }
 
-    // Verificar primero en la tabla `users`
+    // Verificar en la tabla `users`
     const userQuery = `SELECT * FROM users WHERE username = ?`;
     db.query(userQuery, [username], (err, userResults) => {
         if (err) {
@@ -68,44 +68,43 @@ app.post('/api/login', (req, res) => {
         if (userResults.length > 0) {
             const user = userResults[0];
 
-            // Validar la contraseña
             if (user.password === password) {
                 return res.status(200).json({
                     message: 'Inicio de sesión exitoso.',
-                    user: { id: user.id, username: user.username, role: 'user', source: 'users' }
+                    user: { id: user.id, username: user.username, role: 'user' }
                 });
             } else {
                 return res.status(401).json({ error: 'Contraseña incorrecta.' });
             }
         }
 
-        // Si no se encuentra en `users`, verificar en `admins`
+        // Verificar en la tabla `admins`
         const adminQuery = `SELECT * FROM admins WHERE username = ?`;
         db.query(adminQuery, [username], (err, adminResults) => {
             if (err) {
                 console.error(err);
-                return res.status(500).json({ error: 'Error buscando el administrador.' });
+                return res.status(500).json({ error: 'Error buscando al administrador.' });
             }
 
             if (adminResults.length > 0) {
                 const admin = adminResults[0];
 
-                // Validar la contraseña
                 if (admin.password === password) {
                     return res.status(200).json({
                         message: 'Inicio de sesión exitoso.',
-                        user: { id: admin.id, username: admin.username, role: 'admin', source: 'admins' }
+                        user: { id: admin.id, username: admin.username, role: 'admin' }
                     });
                 } else {
                     return res.status(401).json({ error: 'Contraseña incorrecta.' });
                 }
             }
 
-            // Si no se encuentra en ninguna tabla
             return res.status(404).json({ error: 'Usuario o administrador no encontrado.' });
         });
     });
 });
+
+
 
 
 const ADMIN_KEY = '1234567'; // Cambia esto por una clave más segura
@@ -133,23 +132,7 @@ app.post('/api/register-admin', (req, res) => {
         res.status(201).json({ message: 'Administrador registrado con éxito.' });
     });
 });
-app.post('/api/spaces', (req, res) => {
-    const { name, description, capacity} = req.body;
 
-    if (!name || !description || !capacity ) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
-    }
-
-    const query = `INSERT INTO spaces (name, description, capacity) VALUES (?, ?, ?)`;
-    db.query(query, [name, description, capacity], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Error creando el espacio.' });
-        }
-
-        res.status(201).json({ message: 'Espacio creado con éxito.' });
-    });
-});
 app.get('/api/spaces', (req, res) => {
     const query = 'SELECT * FROM spaces';
     db.query(query, (err, results) => {
@@ -161,45 +144,26 @@ app.get('/api/spaces', (req, res) => {
         res.status(200).json(results);
     });
 });
-app.delete('/api/spaces/:id', (req, res) => {
-    const { id } = req.params;
 
-    const query = 'DELETE FROM spaces WHERE id = ?';
-    db.query(query, [id], (err, result) => {
-        if (err) {
-            console.error('Error al eliminar el espacio:', err);
-            return res.status(500).json({ error: 'Error al eliminar el espacio.' });
-        }
+app.put('/api/reservations/:id', (req, res) => {
+    const reservationId = req.params.id; // ID de la reserva desde la URL
+    const { date } = req.body; // Nueva fecha desde el cuerpo de la solicitud
 
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Espacio no encontrado.' });
-        }
-
-        res.status(200).json({ message: 'Espacio eliminado con éxito.' });
-    });
-});
-app.put('/api/spaces/:id', (req, res) => {
-    const { id } = req.params;
-    const { name, description, capacity } = req.body;
-
-    if (!name || !capacity) {
-        return res.status(400).json({ error: 'Los campos name y capacity son obligatorios.' });
+    if (!date) {
+        return res.status(400).json({ error: 'La nueva fecha es obligatoria.' });
     }
 
-    const query = 'UPDATE spaces SET name = ?, description = ?, capacity = ? WHERE id = ?';
-    db.query(query, [name, description || null, capacity, id], (err, result) => {
+    const query = `UPDATE reservations SET date = ? WHERE id = ?`;
+    db.query(query, [date, reservationId], (err, result) => {
         if (err) {
-            console.error('Error al actualizar el espacio:', err);
-            return res.status(500).json({ error: 'Error al actualizar el espacio.' });
+            console.error(err);
+            return res.status(500).json({ error: 'Error actualizando la reserva.' });
         }
 
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Espacio no encontrado.' });
-        }
-
-        res.status(200).json({ message: 'Espacio actualizado con éxito.' });
+        res.status(200).json({ message: 'Reserva actualizada con éxito.' });
     });
 });
+
 //reservas
 app.post('/api/reservations', (req, res) => {
     const { user_id, space_id, date } = req.body;
@@ -255,29 +219,8 @@ app.get('/api/reservations/:userId', (req, res) => {
 });
 
 
-//actualizar reservas
-app.put('/api/reservations/:id', (req, res) => {
-    const { id } = req.params;
-    const { reservation_date } = req.body;
 
-    if (!reservation_date) {
-        return res.status(400).json({ error: 'La nueva fecha es obligatoria.' });
-    }
 
-    const query = 'UPDATE reservations SET reservation_date = ? WHERE id = ?';
-    db.query(query, [date, id], (err, result) => {
-        if (err) {
-            console.error('Error actualizando la reserva:', err);
-            return res.status(500).json({ error: 'Error actualizando la reserva.' });
-        }
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Reserva no encontrada.' });
-        }
-
-        res.status(200).json({ message: 'Reserva actualizada con éxito.' });
-    });
-});
 
 //eliminar reserva
 app.delete('/api/reservations/:id', (req, res) => {
@@ -297,6 +240,60 @@ app.delete('/api/reservations/:id', (req, res) => {
         res.status(200).json({ message: 'Reserva eliminada con éxito.' });
     });
 });
+app.put('/api/spaces/:id', (req, res) => {
+    const spaceId = req.params.id;
+    const { name, description, capacity } = req.body;
+
+    if (!name || !capacity) {
+        return res.status(400).json({ error: 'El nombre y la capacidad son obligatorios.' });
+    }
+
+    const query = `UPDATE spaces SET name = ?, description = ?, capacity = ? WHERE id = ?`;
+    db.query(query, [name, description || '', capacity, spaceId], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Error actualizando el espacio.' });
+        }
+
+        res.status(200).json({ message: 'Espacio actualizado con éxito.' });
+    });
+});
+app.delete('/api/spaces/:id', (req, res) => {
+    const { id } = req.params;
+
+    const query = 'DELETE FROM spaces WHERE id = ?';
+    db.query(query, [id], (err, result) => {
+        if (err) {
+            console.error('Error al eliminar el espacio:', err);
+            return res.status(500).json({ error: 'Error al eliminar el espacio.' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Espacio no encontrado.' });
+        }
+
+        res.status(200).json({ message: 'Espacio eliminado con éxito.' });
+    });
+});
+app.post('/api/spaces', (req, res) => {
+    const { name, description, capacity} = req.body;
+
+    if (!name || !description || !capacity ) {
+        return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+    }
+
+    const query = `INSERT INTO spaces (name, description, capacity) VALUES (?, ?, ?)`;
+    db.query(query, [name, description, capacity], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Error creando el espacio.' });
+        }
+
+        res.status(201).json({ message: 'Espacio creado con éxito.' });
+    });
+});
+
+
 
 
 

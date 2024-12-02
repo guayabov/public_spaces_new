@@ -77,21 +77,27 @@ document.getElementById('loginForm')?.addEventListener('submit', function (event
     fetch('http://localhost:3000/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }) // Enviar los datos de login
+        body: JSON.stringify({ username, password })
     })
         .then(response => response.json())
         .then(data => {
             if (data.message) {
                 alert(data.message); // Mostrar mensaje de éxito
-                localStorage.setItem('loggedInUser', JSON.stringify(data.user));
-                 // Guardar usuario en sesión
-                window.location.href = 'dashboard.html'; // Redirigir al dashboard
+                localStorage.setItem('loggedInUser', JSON.stringify(data.user)); // Guardar usuario en localStorage
+
+                // Redirigir según el rol
+                if (data.user.role === 'admin') {
+                    window.location.href = 'admin-dashboard.html'; // Redirigir al dashboard de admin
+                } else if (data.user.role === 'user') {
+                    window.location.href = 'dashboard.html'; // Redirigir al dashboard de user
+                }
             } else if (data.error) {
                 alert('Error: ' + data.error); // Mostrar error devuelto por el servidor
             }
         })
         .catch(error => console.error('Error iniciando sesión:', error)); // Manejar errores
 });
+
 
 
 
@@ -217,25 +223,38 @@ function loadUserReservations() {
 
 //actualizar reservas
 function updateReservation(reservationId) {
-    const newDate = prompt('Ingresa la nueva fecha para la reserva (YYYY-MM-DD):');
-    if (!newDate) return;
+    const newDateInput = document.getElementById(`newDate-${reservationId}`);
+    const newDate = newDateInput.value;
+
+    if (!newDate) {
+        alert('Por favor, selecciona una nueva fecha.');
+        return;
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    if (newDate < today) {
+        alert('La fecha seleccionada no puede estar en el pasado.');
+        return;
+    }
 
     fetch(`http://localhost:3000/api/reservations/${reservationId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reservation_date: newDate })
+        body: JSON.stringify({ date: newDate })
     })
         .then(response => response.json())
         .then(data => {
             if (data.message) {
                 alert(data.message);
-                loadUserReservations(); // Recarga las reservas del usuario
+                loadUserReservations();
             } else {
                 alert('Error: ' + data.error);
             }
         })
         .catch(error => console.error('Error actualizando la reserva:', error));
 }
+
+
 
 //eliminar reservas
 function deleteReservation(reservationId) {
@@ -256,12 +275,25 @@ function deleteReservation(reservationId) {
         .catch(error => console.error('Error eliminando la reserva:', error));
 }
 
+
 function loadUserReservations() {
+    const currentUser = JSON.parse(localStorage.getItem('loggedInUser'));
+
+    if (!currentUser || !currentUser.id) {
+        console.log('Usuario no autenticado. No se pueden cargar las reservas.');
+        return;
+    }
+
     fetch(`http://localhost:3000/api/reservations/${currentUser.id}`)
         .then(response => response.json())
         .then(reservations => {
             const userReservations = document.getElementById('userReservations');
             userReservations.innerHTML = '<h4>Mis Reservas</h4>';
+
+            if (reservations.length === 0) {
+                userReservations.innerHTML += '<p>No tienes reservas activas.</p>';
+                return;
+            }
 
             reservations.forEach(reservation => {
                 const reservationItem = document.createElement('div');
@@ -269,7 +301,9 @@ function loadUserReservations() {
 
                 reservationItem.innerHTML = `
                     <p><strong>Espacio:</strong> ${reservation.space_name}</p>
-                    <p><strong>Fecha:</strong> ${reservation.reservation_date}</p>
+                    <p><strong>Fecha Actual:</strong> ${reservation.reservation_date}</p>
+                    <label for="newDate-${reservation.reservation_id}">Nueva Fecha:</label>
+                    <input type="date" id="newDate-${reservation.reservation_id}" />
                     <button onclick="updateReservation(${reservation.reservation_id})">Actualizar</button>
                     <button onclick="deleteReservation(${reservation.reservation_id})">Eliminar</button>
                 `;
@@ -279,6 +313,8 @@ function loadUserReservations() {
         })
         .catch(error => console.error('Error cargando reservas del usuario:', error));
 }
+
+
 function renderSpaces(spaces) {
     const spacesList = document.getElementById('spacesList');
     spacesList.innerHTML = ''; // Limpia la lista antes de renderizar
