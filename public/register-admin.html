@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Administrador</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <script>
+        const accessKey = prompt('Por favor, ingresa la clave de acceso para registrar un administrador:');
+        if (accessKey !== '1234567') {
+            alert('Acceso denegado.');
+            window.location.href = 'index.html'; // Redirigir a la página principal
+        }
+    </script>
+    
+    <form id="adminRegisterForm">
+        <h2>Registro de Administrador</h2>
+        <input type="text" id="adminUsername" placeholder="Nombre de usuario" required>
+        <input type="email" id="adminEmail" placeholder="Correo electrónico" required>
+        <input type="password" id="adminPassword" placeholder="Contraseña" required>
+        <input type="password" id="adminKey" placeholder="Clave de acceso" required>
+        <button type="submit">Registrar Administrador</button>
+    </form>
+    <script src="js/admin-register.js"></script>
+</body>
+</html>

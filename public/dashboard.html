@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="css/style_dashboard_general.css">
+</head>
+<body>
+    <header>
+        <button id="logoutButton">Cerrar Sesión</button>
+    </header>
+
+    <main>
+        <div id="userReservations" style="margin-top: 20px;" class="user-reservations">
+            <!-- Aquí se cargarán las reservas del usuario -->
+        </div>
+        
+        <div id="spacesList" class="spaces-container">
+            <!-- Aquí se cargarán los espacios -->
+        </div>
+        <h2>Espacios Disponibles</h2>
+        <div id="spacesList" class="spaces-container">
+            <!-- Aquí se renderizan dinámicamente los espacios -->
+        </div>
+
+        <div id="adminActions" style="display: none;">
+            <h2>Gestión de Espacios (Admin)</h2>
+            <button id="createSpaceButton">Crear Nuevo Espacio</button>
+        </div>
+    </main>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
