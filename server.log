@@ -1,0 +1,14 @@
+6/12/2024, 12:05:10 a. m. - Reserva con ID 9 eliminada exitosamente.
+6/12/2024, 12:05:19 a. m. - Reserva creada exitosamente. Usuario ID: 2, Espacio ID: 1, Fecha: 2024-12-27, Reserva ID: 14.
+6/12/2024, 12:05:31 a. m. - Error: Fallo al actualizar la reserva ID: 14. Error de base de datos.
+6/12/2024, 12:05:37 a. m. - Reserva ID: 14 actualizada con éxito a la fecha 2025-01-07.
+6/12/2024, 12:05:59 a. m. - Reserva con ID 14 eliminada exitosamente.
+6/12/2024, 12:09:23 a. m. - Usuario "cuali" registrado con éxito.
+6/12/2024, 12:10:59 a. m. - Administrador "admini4" registrado con éxito.
+6/12/2024, 12:12:05 a. m. - Espacio "zona social" creado exitosamente con ID 6.
+6/12/2024, 12:12:25 a. m. - Espacio con ID 6 actualizado exitosamente. Nuevo nombre: "social", Capacidad: 25.
+6/12/2024, 12:12:33 a. m. - Espacio con ID 6 eliminado exitosamente.
+6/12/2024, 12:14:05 a. m. - Reserva creada exitosamente. Usuario ID: 10, Espacio ID: 1, Fecha: 2025-01-31, Reserva ID: 15.
+6/12/2024, 12:14:26 a. m. - Reserva con ID 13 eliminada exitosamente.
+6/12/2024, 12:15:00 a. m. - Error: Espacio ID: 1 ya está reservado para la fecha 2025-01-31.
+6/12/2024, 12:15:12 a. m. - Reserva creada exitosamente. Usuario ID: 4, Espacio ID: 1, Fecha: 2025-01-30, Reserva ID: 16.
