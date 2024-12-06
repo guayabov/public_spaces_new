@@ -366,6 +366,25 @@ app.post('/api/spaces', (req, res) => {
         res.status(201).json({ message: 'Espacio creado con éxito.', spaceId: result.insertId });
     });
 });
+app.get('/api/spaces/:id/reservations', (req, res) => {
+    const spaceId = req.params.id;
+
+    const query = `
+        SELECT r.id AS reservation_id, r.date AS reservation_date, u.username AS user_name
+        FROM reservations r
+        JOIN users u ON r.user_id = u.id
+        WHERE r.space_id = ?
+    `;
+
+    db.query(query, [spaceId], (err, results) => {
+        if (err) {
+            console.error('Error obteniendo reservas del espacio:', err);
+            return res.status(500).json({ error: 'Error obteniendo reservas del espacio.' });
+        }
+
+        res.status(200).json(results);
+    });
+});
 
 
 

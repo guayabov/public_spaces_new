@@ -68,12 +68,53 @@ function renderSpaces(spaces) {
             <h3>${space.name}</h3>
             <p>Descripción: ${space.description || 'Sin descripción'}</p>
             <p>Capacidad: ${space.capacity}</p>
+            <button onclick="viewReservations(${space.id})">Ver Reservas</button>
             <button onclick="updateSpace(${space.id})">Editar</button>
             <button onclick="deleteSpace(${space.id})">Eliminar</button>
+            <div id="reservations-${space.id}" class="reservations-container" style="display: none;">
+                <h4>Reservas</h4>
+                <div class="reservations-list"></div>
+            </div>
         `;
 
         spacesList.appendChild(spaceCard);
     });
+}
+
+// Función para obtener y mostrar reservas de un espacio específico
+function viewReservations(spaceId) {
+    const reservationsContainer = document.getElementById(`reservations-${spaceId}`);
+    const reservationsList = reservationsContainer.querySelector('.reservations-list');
+
+    if (reservationsContainer.style.display === 'none') {
+        reservationsContainer.style.display = 'block';
+
+        fetch(`http://localhost:3000/api/spaces/${spaceId}/reservations`)
+            .then(response => response.json())
+            .then(reservations => {
+                reservationsList.innerHTML = ''; // Limpiar la lista antes de renderizar
+
+                if (reservations.length === 0) {
+                    reservationsList.innerHTML = '<p>No hay reservas para este espacio.</p>';
+                    return;
+                }
+
+                reservations.forEach(reservation => {
+                    const reservationItem = document.createElement('div');
+                    reservationItem.className = 'reservation-item';
+
+                    reservationItem.innerHTML = `
+                        <p><strong>Usuario:</strong> ${reservation.user_name}</p>
+                        <p><strong>Fecha:</strong> ${reservation.reservation_date}</p>
+                    `;
+
+                    reservationsList.appendChild(reservationItem);
+                });
+            })
+            .catch(error => console.error(`Error cargando reservas del espacio ${spaceId}:`, error));
+    } else {
+        reservationsContainer.style.display = 'none';
+    }
 }
 
 // Función para actualizar un espacio
