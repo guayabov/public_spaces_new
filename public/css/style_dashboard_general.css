@@ -161,25 +161,3 @@ h1 {
         padding: 8px 16px;
     }
 }
-.admin-space-card {
-    border: 1px solid #ccc;
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-}
-
-.reservations-container {
-    margin-top: 10px;
-    padding: 10px;
-    border-top: 1px solid #ddd;
-}
-
-.reservation-item {
-    padding: 5px 0;
-    border-bottom: 1px dashed #ddd;
-}
-
-.reservation-item p {
-    margin: 5px 0;
-}
